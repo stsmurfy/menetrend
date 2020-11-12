@@ -31,10 +31,18 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   List<TravelRoute> _result;
   bool _loading = false;
+  final _from = TextEditingController();
+  final _to = TextEditingController();
 
   @override
   void initState() {
     super.initState();
+  }
+
+  void dispose() {
+    _from.dispose();
+    _to.dispose();
+    super.dispose();
   }
 
   _refresh() async {
@@ -44,7 +52,7 @@ class _MainPageState extends State<MainPage> {
     });
 
     _result = await Api.getRoutes(
-        "Debrecen", "Budapest", DateTime.utc(2020, 11, 11), TravelType.train);
+        _from.text, _to.text, DateTime.utc(2020, 11, 11), TravelType.train);
 
     setState(() {
       _loading = false;
@@ -62,10 +70,15 @@ class _MainPageState extends State<MainPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              RaisedButton(
-                  child: Text('Lekérés'),
-                  onPressed: _refresh
-              ),
+              ListTile(
+                  title: TextField(
+                      decoration: InputDecoration(hintText: "Honnan"),
+                      controller: _from),
+                  subtitle: TextField(
+                      decoration: InputDecoration(hintText: "Hova"),
+                      controller: _to),
+                  trailing: RaisedButton(
+                      child: Text('Lekérés'), onPressed: _refresh)),
               (_result != null
                   ? Table(
                       children: _result
